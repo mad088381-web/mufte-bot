@@ -5,7 +5,7 @@ import os
 
 TOKEN = "8371602272:AAH5WoH4SzJWlQvqgVEjtI3JeaeUppTZ6vY" 
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 telegram_app = ApplicationBuilder().token(TOKEN).build()
 # بدء البوت
@@ -155,9 +155,10 @@ def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
     telegram_app.update_queue.put_nowait(update)
     return "ok"
-if __name__ == '_main_':
+if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 5000))
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(button))
+
 
     app.run(host="0.0.0.0", port=PORT)
