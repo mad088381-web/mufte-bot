@@ -150,6 +150,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "contact":
         await query.edit_message_text("تواصل معنا عبر 🧡💙\n💬رابط صفحتنا على منصة فيسبوك\nhttps://www.facebook.com/share/19Tmag7VA6/\n💬رابط صفحتنا على منصة انستغرام\nhttps://www.instagram.com/al_mufti_for_travel?igsh=bWI5ZjF0cTUxazl3", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")]]))
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Bot is running."
 @app.route("/", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
@@ -162,3 +165,4 @@ if __name__ == '__main__':
 
 
     app.run(host="0.0.0.0", port=PORT)
+
