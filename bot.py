@@ -155,7 +155,7 @@ def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
     telegram_app.update_queue.put_nowait(update)
     return "ok"
-if _name_ == '_main_':
+if __name__ == '_main_':
     PORT = int(os.environ.get("PORT", 5000))
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(button))
