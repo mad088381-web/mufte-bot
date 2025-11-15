@@ -2,8 +2,11 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from flask import Flask, request
 import os
+import requests
 
 TOKEN = "8371602272:AAH5WoH4SzJWlQvqgVEjtI3JeaeUppTZ6vY" 
+
+WEBHOOK_URL="https://mufte-bot-1.onrender.com"
 
 app = Flask(__name__)
 
@@ -150,19 +153,25 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "contact":
         await query.edit_message_text("تواصل معنا عبر 🧡💙\n💬رابط صفحتنا على منصة فيسبوك\nhttps://www.facebook.com/share/19Tmag7VA6/\n💬رابط صفحتنا على منصة انستغرام\nhttps://www.instagram.com/al_mufti_for_travel?igsh=bWI5ZjF0cTUxazl3", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")]]))
 
-@app.route("/", methods=["GET"])
-def home():
-    return "Bot is running."
 @app.route("/", methods=["POST"])
 def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
     telegram_app.update_queue.put_nowait(update)
-    return "ok"
+    return "ok", 200
 if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 5000))
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(button))
 
+# إزالة أي webhook سابق
+requests.get(f"https://api.telegram.org/bot{TOKEN}/deleteWebhook")
 
-    app.run(host="0.0.0.0", port=PORT)
+# تعيين Webhook جديد
+set_hook = requests.get(
+        f"https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}"
+    ).json()
 
+print("Webhook status:", set_hook)
+
+    # تشغيل Flask
+app.run(host="0.0.0.0", port=PORT)
