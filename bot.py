@@ -2,6 +2,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from flask import Flask, request
 import os
+import asyncio
 
 TOKEN = "8371602272:AAH5WoH4SzJWlQvqgVEjtI3JeaeUppTZ6vY" 
 
@@ -152,14 +153,25 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "contact":
         await query.edit_message_text("تواصل معنا عبر 🧡💙\n💬رابط صفحتنا على منصة فيسبوك\nhttps://www.facebook.com/share/19Tmag7VA6/\n💬رابط صفحتنا على منصة انستغرام\nhttps://www.instagram.com/al_mufti_for_travel?igsh=bWI5ZjF0cTUxazl3", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")]]))
 
-@app.route("/", methods=["POST"])
+@app.post("/webhook")
 def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
     telegram_app.update_queue.put_nowait(update)
     return "ok"
-if __name__ == '__main__':
-    PORT = int(os.environ.get("PORT", 5000))
+
+# --------------------- تشغيل البوت + ربط Webhook ---------------------
+
+async def set_webhook():
+    await telegram_app.bot.set_webhook(url=WEBHOOK_URL)
+    print("Webhook set ✓")
+
+if __name__ == "__main__":
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(button))
-    # تشغيل Flask
-app.run(host="0.0.0.0", port=PORT)
+
+    # شغّل Webhook
+    asyncio.run(set_webhook())
+
+    # شغّل السيرفر
+    PORT = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=PORT)
