@@ -2,7 +2,6 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from flask import Flask, request
 import os
-import requests
 
 TOKEN = "8371602272:AAH5WoH4SzJWlQvqgVEjtI3JeaeUppTZ6vY" 
 
@@ -157,21 +156,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def webhook():
     update = Update.de_json(request.get_json(force=True), telegram_app.bot)
     telegram_app.update_queue.put_nowait(update)
-    return "ok", 200
+    return "ok"
 if __name__ == '__main__':
     PORT = int(os.environ.get("PORT", 5000))
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(button))
-
-# إزالة أي webhook سابق
-requests.get(f"https://api.telegram.org/bot{TOKEN}/deleteWebhook")
-
-# تعيين Webhook جديد
-set_hook = requests.get(
-        f"https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}"
-    ).json()
-
-print("Webhook status:", set_hook)
-
     # تشغيل Flask
 app.run(host="0.0.0.0", port=PORT)
